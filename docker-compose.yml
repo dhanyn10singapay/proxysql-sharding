@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  proxysql:
+    container_name: proxysql
+    image: proxysql/proxysql
+    ports:
+      - "16032:6032"
+      - "16033:6033"
+      - "16070:6070"
+    volumes:
+      - ./cnf/proxysql.cnf:/etc/proxysql.cnf
+    restart: unless-stopped
+    networks:
+      - proxysql
+
+  mariadb1:
+    image: mariadb:10.11
+    container_name: mariadb1
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: db_home
+    ports:
+      - "3306:3306"
+    networks:
+      - proxysql
+
+  mariadb2:
+    image: mariadb:10.11
+    container_name: mariadb2
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: db_home
+    ports:
+      - "3307:3306"
+    networks:
+      - proxysql
+
+networks:
+  proxysql:
+    driver: bridge
