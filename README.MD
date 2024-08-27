@@ -22,7 +22,7 @@ reference proxysql [documentation](https://proxysql.com/documentation/proxysql-c
     ProxySQL Admin> INSERT INTO mysql_servers(hostgroup_id,hostname,port) VALUES (1,'mariadb1',3306);
     Query OK, 1 row affected (0.01 sec)
 
-    ProxySQL Admin> INSERT INTO mysql_servers(hostgroup_id,hostname,port) VALUES (1,'mariadb2',3306);
+    ProxySQL Admin> INSERT INTO mysql_servers(hostgroup_id,hostname,port) VALUES (2,'mariadb2',3306);
     Query OK, 1 row affected (0.01 sec)
     ```
 4. check the host in mysql_servers
@@ -32,7 +32,7 @@ reference proxysql [documentation](https://proxysql.com/documentation/proxysql-c
     | hostgroup_id | hostname | port | gtid_port | status | weight | compression | max_connections | max_replication_lag | use_ssl | max_latency_ms | comment |
     +--------------+----------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
     | 1            | mariadb1 | 3306 | 0         | ONLINE | 1      | 0           | 1000            | 0                   | 0       | 0              |         |
-    | 1            | mariadb2 | 3306 | 0         | ONLINE | 1      | 0           | 1000            | 0                   | 0       | 0              |         |
+    | 2            | mariadb2 | 3306 | 0         | ONLINE | 1      | 0           | 1000            | 0                   | 0       | 0              |         |
     +--------------+----------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
     2 rows in set (0.000 sec)
     ```
@@ -181,10 +181,53 @@ Initial configuration ends with connect and ping test to database **mariadb1** a
     ```sql
     CREATE TABLE user (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        email VARCHAR(255) NOT NULL UNIQUE,
         nama VARCHAR(255) NOT NULL,
-        password VARCHAR(255) NOT NULL
+        password VARCHAR(255) NOT NULL,
+        location VARCHAR(255) NOT NULL
     );
     ```
 ## Setup Rules
 you need create rules to make your data spread to database
+1. login to proxysql
+    ```bash
+    mysql -u admin -padmin -h 127.0.0.1 -P6032 --prompt 'ProxySQL Admin> '
+    ```
+2. add new rules
+    ```sql
+    ProxySQL Admin> INSERT INTO mysql_query_rules (match_pattern, destination_hostgroup, apply, active) VALUES 
+    ( "shard_sby", 1, 1, 1);
+    ProxySQL Admin> INSERT INTO mysql_query_rules (match_pattern, destination_hostgroup, apply, active) VALUES 
+    ( "shard_jkt", 2, 1, 1);
+    ```
+3. check rules
+    ```sql
+    ProxySQL Admin> select match_digest, destination_hostgroup, apply from mysql_query_rules;
+    ```
+3. Reload rules and apply changes
+    ```sql
+    ProxySQL Admin> LOAD MYSQL QUERY RULES TO RUNTIME;
+    ProxySQL Admin> SAVE MYSQL QUERY RULES TO DISK;
+    ```
+## Add User
+add user from mariadb to proxysql to enable sending query through proxysql
+```sql
+ProxySQL Admin> INSERT INTO mysql_users (username, password, default_hostgroup) VALUES ('root', 'password', 1);
+Query OK, 1 row affected (0.000 sec)
+
+ProxySQL Admin> LOAD MYSQL USERS TO RUNTIME;
+Query OK, 0 rows affected (0.001 sec)
+
+ProxySQL Admin> SAVE MYSQL USERS TO DISK;
+Query OK, 0 rows affected (0.031 sec)
+```
+## Test
+1. try connecting to proxysql, before insert data
+    ```bash
+    mysql -c -h 127.0.0.1 -P 6033 -u root -ppassword
+    ```
+2. CRUD
+    1. insert data. Run following command in **proxysql** container
+        ```sql
+        mysql -c -h 127.0.0.1 -P 6033 -u root -ppassword -e "INSERT INTO /* shard_sby */ db_home.user (nama, password, location) VALUES ('User1', 'password', 'surabaya')";
+        mysql -c -h 127.0.0.1 -P 6033 -u root -ppassword -e "INSERT INTO /* shard_jkt */  db_home.user (nama, password, location) VALUES ('User2', 'password', 'jakarta')";
+        ```
