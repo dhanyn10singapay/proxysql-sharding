@@ -118,7 +118,7 @@ reference proxysql [documentation](https://proxysql.com/documentation/proxysql-c
     | hostgroup_id | hostname | port | gtid_port | status | weight | compression | max_connections | max_replication_lag | use_ssl | max_latency_ms | comment |
     +--------------+----------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
     | 1            | mariadb1 | 3306 | 0         | ONLINE | 1      | 0           | 1000            | 0                   | 0       | 0              |         |
-    | 1            | mariadb2 | 3306 | 0         | ONLINE | 1      | 0           | 1000            | 0                   | 0       | 0              |         |
+    | 2            | mariadb2 | 3306 | 0         | ONLINE | 1      | 0           | 1000            | 0                   | 0       | 0              |         |
     +--------------+----------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
     2 rows in set (0.000 sec)
     ```
