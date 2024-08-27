@@ -1,4 +1,4 @@
-# DB SHarding with ProxySQL
+# DB Sharding with ProxySQL
 
 ## Initial Configuration
 reference proxysql [documentation](https://proxysql.com/documentation/proxysql-configuration/)
