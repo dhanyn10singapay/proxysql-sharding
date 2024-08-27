@@ -201,7 +201,7 @@ you need create rules to make your data spread to database
     ```
 3. check rules
     ```sql
-    ProxySQL Admin> select match_digest, destination_hostgroup, apply from mysql_query_rules;
+    ProxySQL Admin> select match_pattern, destination_hostgroup, apply from mysql_query_rules;
     ```
 3. Reload rules and apply changes
     ```sql
