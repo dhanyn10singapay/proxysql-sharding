@@ -227,7 +227,30 @@ Query OK, 0 rows affected (0.031 sec)
     ```
 2. CRUD
     1. insert data. Run following command in **proxysql** container
-        ```sql
+        ```bash
         mysql -c -h 127.0.0.1 -P 6033 -u root -ppassword -e "INSERT INTO /* shard_sby */ db_home.user (nama, password, location) VALUES ('User1', 'password', 'surabaya')";
         mysql -c -h 127.0.0.1 -P 6033 -u root -ppassword -e "INSERT INTO /* shard_jkt */  db_home.user (nama, password, location) VALUES ('User2', 'password', 'jakarta')";
+        ```
+    2. read data. Run following command in **proxysql** container
+        ```bash
+        mysql -c -h 127.0.0.1 -P 6033 -u root -ppassword -e "SELECT /* shard_jkt */ * from db_home.user";
+        +----+-------+----------+----------+
+        | id | nama  | password | location |
+        +----+-------+----------+----------+
+        |  1 | User2 | password | jakarta  |
+        +----+-------+----------+----------+
+        ```
+    3. update data. Run following command in **proxysql** container
+        ```bash
+        mysql -c -h 127.0.0.1 -P 6033 -u root -ppassword -e "UPDATE /* shard_jkt */ db_home.user set nama='User2next' where id=1";
+        mysql -c -h 127.0.0.1 -P 6033 -u root -ppassword -e "SELECT /* shard_jkt */ * from db_home.user";
+        +----+-----------+----------+----------+
+        | id | nama      | password | location |
+        +----+-----------+----------+----------+
+        |  1 | User2next | password | jakarta  |
+        +----+-----------+----------+----------+
+        ```
+    4. delete data. Run following command in **proxysql** container
+        ```bash
+        mysql -c -h 127.0.0.1 -P 6033 -u root -ppassword -e "DELETE FROM /* shard_jkt */ db_home.user where id=1";
         ```
