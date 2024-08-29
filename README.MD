@@ -113,7 +113,6 @@ reference proxysql [documentation](https://proxysql.com/documentation/proxysql-c
     Query OK, 0 rows affected (0.00 sec)
 
     ProxySQL Admin> SELECT * FROM mysql_servers;
-    ProxySQL Admin> SELECT * FROM mysql_servers;
     +--------------+----------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
     | hostgroup_id | hostname | port | gtid_port | status | weight | compression | max_connections | max_replication_lag | use_ssl | max_latency_ms | comment |
     +--------------+----------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
